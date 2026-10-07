@@ -10,15 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+
+      - name: Get source code
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t nginx-cicd:dev .
+        run: docker build -t nginx-app .
 
-      - name: Test Nginx
+      - name: Test Docker container
         run: |
-          docker run -d --name nginx-test -p 8080:80 nginx-cicd:dev
+          docker run -d --name nginx-test -p 8080:80 nginx-app
           sleep 5
           curl http://localhost:8080
           docker stop nginx-test
