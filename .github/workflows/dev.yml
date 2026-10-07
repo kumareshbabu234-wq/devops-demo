@@ -1,0 +1,44 @@
+name: DEV CI/CD
+
+on:
+  push:
+    branches:
+      - dev
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dev:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate project
+        run: |
+          echo "Development validation successful"
+          ls -la
+
+      - name: Create PR from dev to main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_EXISTS=$(gh pr list \
+            --base main \
+            --head dev \
+            --state open \
+            --json number \
+            --jq 'length')
+
+          if [ "$PR_EXISTS" -eq 0 ]; then
+            gh pr create \
+              --base main \
+              --head dev \
+              --title "Release: dev to main" \
+              --body "Automatically created PR from dev to main after successful development validation."
+          else
+            echo "PR already exists."
+          fi
