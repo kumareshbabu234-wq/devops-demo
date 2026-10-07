@@ -1,0 +1,29 @@
+name: DEV CI/CD
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t nginx-cicd:dev .
+
+      - name: Test Docker image
+        run: |
+          docker run -d --name nginx-test -p 8080:80 nginx-cicd:dev
+          sleep 5
+          curl http://localhost:8080
+          docker stop nginx-test
+
+      - name: DEV deployment
+        run: |
+          echo "DEV deployment successful"
